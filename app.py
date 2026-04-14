@@ -1,26 +1,19 @@
 import streamlit as st
 
-# Ρύθμιση για Mobile-first προβολή
+# Ρύθμιση για Mobile-first
 st.set_page_config(page_title="Volley Tactical Pro", layout="centered")
 
-# --- CSS v57: Οριστική Διόρθωση για Κάθετη Προβολή ---
+# --- CSS v58: Hardcoded Layout για Κινητά ---
 st.markdown("""
 <style>
-    /* 1. Κεντράρισμα και αφαίρεση περιθωρίων Streamlit */
-    .stApp { align-items: center; }
     .block-container {
-        max-width: 100% !important;
+        max-width: 360px !important;
         padding: 0.5rem !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        margin: 0 auto;
     }
 
-    /* 2. Το Wrapper των γηπέδων (Προσαρμόζεται στο πλάτος της οθόνης) */
     .tactical-wrapper {
         width: 100%;
-        max-width: 400px; /* Ιδανικό για να μην "χάνεται" σε μεγάλες οθόνες */
-        margin: 0 auto;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -45,7 +38,7 @@ st.markdown("""
         width: 100%;
         box-sizing: border-box;
         border: 4px solid #333;
-        background-color: #eee;
+        background-color: #f0f0f0;
     }
 
     .player-cell {
@@ -53,21 +46,20 @@ st.markdown("""
         justify-content: center;
         align-items: center;
         font-weight: bold;
-        font-size: 22px;
+        font-size: 24px;
         border-radius: 4px;
         border: 1px solid rgba(0,0,0,0.1);
         position: relative;
-        aspect-ratio: 1.1 / 1;
+        aspect-ratio: 1.2 / 1;
     }
 
     .label-p { position: absolute; top: 2px; left: 4px; font-size: 9px; opacity: 0.8; }
 
     .net-divider {
-        width: 100%;
-        height: 18px;
+        width: 100%; height: 20px;
         background-color: #222;
         margin: 8px 0;
-        border: 1px solid #000;
+        border: 2px solid #000;
     }
 
     .opp-court { background-color: #5DADE2 !important; color: #1B2631 !important; }
@@ -76,36 +68,13 @@ st.markdown("""
     .highlight-target { background-color: #F1C40F !important; color: #000 !important; border: 2px solid #333; }
     .highlight-setter { background-color: #E67E22 !important; color: #fff !important; border: 2px solid #D35400; }
 
-    /* --- 3. ΤΟ ΚΛΕΙΔΙ: ΕΞΑΝΑΓΚΑΣΜΟΣ ΚΟΥΜΠΙΩΝ ΣΕ ΜΙΑ ΣΕΙΡΑ (ΚΑΘΕΤΑ) --- */
-    /* Στοχεύουμε το εσωτερικό container των στηλών */
-    [data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important; /* Πάντα σε σειρά */
-        flex-wrap: nowrap !important; /* Ποτέ αλλαγή σειράς */
-        width: 100% !important;
-        max-width: 400px !important;
-        gap: 4px !important;
-        margin: 10px auto !important;
-        padding: 0 !important;
-    }
-
-    /* Κάθε στήλη παίρνει ακριβώς το 1/3 */
-    [data-testid="column"] {
-        width: 33.33% !important;
-        flex: 1 1 0% !important;
-        min-width: 0 !important;
-    }
-
-    div.stButton > button {
-        background-color: #1E88E5 !important;
-        color: white !important;
-        border-radius: 6px !important;
-        height: 3.8rem !important;
-        font-weight: bold !important;
-        font-size: 11px !important;
-        width: 100% !important;
-        border: none !important;
-        white-space: normal !important; /* Επιτρέπει στο κείμενο να αλλάξει γραμμή αν δεν χωράει */
+    /* --- ΤΟ ΚΛΕΙΔΙ: CUSTOM HTML BUTTON ROW --- */
+    .custom-btn-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 5px;
+        width: 100%;
+        margin-top: 15px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -181,22 +150,45 @@ else:
         oly_html += f'<div class="{cls}"><span class="label-p">P{p}</span>{val}</div>'
     st.markdown(oly_html + '</div>', unsafe_allow_html=True)
 
-    # --- BUTTONS ROW (FORCED) ---
-    st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        if st.button("Περιστρ. (-)"):
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- ΤΟ ΚΟΛΠΟ: Χρήση κουμπιών χωρίς Columns του Streamlit ---
+    # Δημιουργούμε μια "ψεύτικη" σειρά κουμπιών που το Streamlit δεν μπορεί να σπάσει
+    st.write("") # space
+    
+    # Χρησιμοποιούμε st.button αλλά με CSS που τα κάνει "inline-block" και τα "αναγκάζει" να μείνουν μαζί
+    cols = st.columns([1,1,1])
+    with cols[0]:
+        if st.button("Περιστρ. (-)", key="btn_prev", use_container_width=True):
             st.session_state.oly_p = get_next_pos(st.session_state.oly_p, -1)
             st.session_state.opp_p = get_next_pos(st.session_state.opp_p, -1)
             st.rerun()
-    with c2:
-        if st.button("Νέα Εργασία"):
+    with cols[1]:
+        if st.button("Νέα Εργασία", key="btn_new", use_container_width=True):
             st.session_state.active = False
             st.rerun()
-    with c3:
-        if st.button("Περιστρ. (+)"):
+    with cols[2]:
+        if st.button("Περιστρ. (+)", key="btn_next", use_container_width=True):
             st.session_state.oly_p = get_next_pos(st.session_state.oly_p, 1)
             st.session_state.opp_p = get_next_pos(st.session_state.opp_p, 1)
             st.rerun()
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # ΕΠΙΠΛΕΟΝ CSS ΓΙΑ ΝΑ ΜΗΝ ΣΠΑΝΕ ΠΟΤΕ ΤΑ COLUMNS
+    st.markdown("""
+    <script>
+        var cols = window.parent.document.querySelectorAll('[data-testid="column"]');
+        cols.forEach(function(col) {
+            col.style.minWidth = '0px';
+            col.style.flex = '1';
+        });
+    </script>
+    <style>
+        [data-testid="stHorizontalBlock"] {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
