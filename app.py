@@ -1,25 +1,25 @@
 import streamlit as st
 
-st.set_page_config(page_title="Volley Tactical Pro v56", layout="centered")
+# Ρύθμιση για Mobile-first προβολή
+st.set_page_config(page_title="Volley Tactical Pro", layout="centered")
 
-# --- CSS για Dual Orientation (Portrait & Landscape) ---
+# --- CSS v57: Οριστική Διόρθωση για Κάθετη Προβολή ---
 st.markdown("""
 <style>
-    /* Γενικό Layout που προσαρμόζεται στο πλάτος */
+    /* 1. Κεντράρισμα και αφαίρεση περιθωρίων Streamlit */
+    .stApp { align-items: center; }
     .block-container {
-        padding-top: 1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
         max-width: 100% !important;
+        padding: 0.5rem !important;
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
-    /* Το wrapper ακολουθεί το πλάτος της συσκευής */
+    /* 2. Το Wrapper των γηπέδων (Προσαρμόζεται στο πλάτος της οθόνης) */
     .tactical-wrapper {
         width: 100%;
-        max-width: 500px; /* Μέγιστο πλάτος για να μην "απλώνει" υπερβολικά σε tablet */
+        max-width: 400px; /* Ιδανικό για να μην "χάνεται" σε μεγάλες οθόνες */
         margin: 0 auto;
         display: flex;
         flex-direction: column;
@@ -32,20 +32,20 @@ st.markdown("""
         font-weight: bold;
         padding: 10px 0;
         color: white;
-        font-size: clamp(12px, 4vw, 16px); /* Δυναμικό μέγεθος γραμματοσειράς */
+        font-size: 14px;
         border-radius: 8px 8px 0 0;
-        text-transform: uppercase;
+        margin: 0;
     }
 
     .grid-layout {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 1vw;
-        padding: 2vw;
+        gap: 5px;
+        padding: 8px;
         width: 100%;
         box-sizing: border-box;
         border: 4px solid #333;
-        background-color: #f4f4f4;
+        background-color: #eee;
     }
 
     .player-cell {
@@ -53,22 +53,20 @@ st.markdown("""
         justify-content: center;
         align-items: center;
         font-weight: bold;
-        font-size: clamp(18px, 6vw, 28px);
-        border-radius: 6px;
+        font-size: 22px;
+        border-radius: 4px;
         border: 1px solid rgba(0,0,0,0.1);
         position: relative;
-        aspect-ratio: 1.2 / 1;
+        aspect-ratio: 1.1 / 1;
     }
 
-    .label-p { position: absolute; top: 2px; left: 4px; font-size: clamp(8px, 2vw, 10px); opacity: 0.7; }
+    .label-p { position: absolute; top: 2px; left: 4px; font-size: 9px; opacity: 0.8; }
 
     .net-divider {
         width: 100%;
-        height: 20px;
+        height: 18px;
         background-color: #222;
-        background-image: linear-gradient(45deg, #444 25%, transparent 25%, transparent 50%, #444 50%, #444 75%, transparent 75%, transparent);
-        background-size: 8px 8px;
-        margin: 10px 0;
+        margin: 8px 0;
         border: 1px solid #000;
     }
 
@@ -78,31 +76,36 @@ st.markdown("""
     .highlight-target { background-color: #F1C40F !important; color: #000 !important; border: 2px solid #333; }
     .highlight-setter { background-color: #E67E22 !important; color: #fff !important; border: 2px solid #D35400; }
 
-    /* --- ΔΥΝΑΜΙΚΑ ΚΟΥΜΠΙΑ ΓΙΑ ΟΡΙΖΟΝΤΙΑ/ΚΑΘΕΤΗ ΠΡΟΒΟΛΗ --- */
+    /* --- 3. ΤΟ ΚΛΕΙΔΙ: ΕΞΑΝΑΓΚΑΣΜΟΣ ΚΟΥΜΠΙΩΝ ΣΕ ΜΙΑ ΣΕΙΡΑ (ΚΑΘΕΤΑ) --- */
+    /* Στοχεύουμε το εσωτερικό container των στηλών */
     [data-testid="stHorizontalBlock"] {
-        width: 100% !important;
-        max-width: 500px !important;
-        gap: 8px !important;
-        margin: 15px auto !important;
         display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
+        flex-direction: row !important; /* Πάντα σε σειρά */
+        flex-wrap: nowrap !important; /* Ποτέ αλλαγή σειράς */
+        width: 100% !important;
+        max-width: 400px !important;
+        gap: 4px !important;
+        margin: 10px auto !important;
+        padding: 0 !important;
     }
 
+    /* Κάθε στήλη παίρνει ακριβώς το 1/3 */
     [data-testid="column"] {
-        flex: 1 !important;
+        width: 33.33% !important;
+        flex: 1 1 0% !important;
         min-width: 0 !important;
     }
 
     div.stButton > button {
         background-color: #1E88E5 !important;
         color: white !important;
-        border-radius: 8px !important;
-        height: clamp(3rem, 10vw, 4rem) !important;
+        border-radius: 6px !important;
+        height: 3.8rem !important;
         font-weight: bold !important;
-        font-size: clamp(10px, 3vw, 14px) !important;
+        font-size: 11px !important;
         width: 100% !important;
         border: none !important;
+        white-space: normal !important; /* Επιτρέπει στο κείμενο να αλλάξει γραμμή αν δεν χωράει */
     }
 </style>
 """, unsafe_allow_html=True)
@@ -133,9 +136,9 @@ if not st.session_state.active:
         l, r = st.columns(2)
         with l:
             st.subheader("🔴 OLY")
-            op = st.number_input("Π", value=19); oa1 = st.number_input("Α1", value=8)
+            op = st.number_input("Π", value=19); ok1 = st.number_input("Κ1", value=22)
+            oa1 = st.number_input("Α1", value=8); oa2 = st.number_input("Α2", value=7)
             ok2 = st.number_input("Κ2", value=21); od = st.number_input("Δ", value=14)
-            oa2 = st.number_input("Α2", value=7); ok1 = st.number_input("Κ1", value=22)
             mt = st.selectbox("Στόχος OLY", [op, oa1, ok2, od, oa2, ok1], index=1)
         with r:
             st.subheader("🚀 ANT")
@@ -178,7 +181,8 @@ else:
         oly_html += f'<div class="{cls}"><span class="label-p">P{p}</span>{val}</div>'
     st.markdown(oly_html + '</div>', unsafe_allow_html=True)
 
-    # Responsive Buttons
+    # --- BUTTONS ROW (FORCED) ---
+    st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
         if st.button("Περιστρ. (-)"):
