@@ -1,17 +1,18 @@
 import streamlit as st
 
-# Ρύθμιση για Mobile-first
 st.set_page_config(page_title="Volley Tactical Pro", layout="centered")
 
-# --- CSS v58: Hardcoded Layout για Κινητά ---
+# --- CSS v59: Οριστικό Κλείδωμα σε Κινητά (Portrait) ---
 st.markdown("""
 <style>
+    /* Κεντράρισμα εφαρμογής */
     .block-container {
         max-width: 360px !important;
-        padding: 0.5rem !important;
+        padding: 1rem 0.5rem !important;
         margin: 0 auto;
     }
 
+    /* Γήπεδα */
     .tactical-wrapper {
         width: 100%;
         display: flex;
@@ -23,21 +24,21 @@ st.markdown("""
         width: 100%;
         text-align: center;
         font-weight: bold;
-        padding: 10px 0;
+        padding: 8px 0;
         color: white;
-        font-size: 14px;
+        font-size: 13px;
         border-radius: 8px 8px 0 0;
-        margin: 0;
+        text-transform: uppercase;
     }
 
     .grid-layout {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 5px;
-        padding: 8px;
+        gap: 4px;
+        padding: 6px;
         width: 100%;
         box-sizing: border-box;
-        border: 4px solid #333;
+        border: 3px solid #333;
         background-color: #f0f0f0;
     }
 
@@ -46,35 +47,45 @@ st.markdown("""
         justify-content: center;
         align-items: center;
         font-weight: bold;
-        font-size: 24px;
+        font-size: 20px;
         border-radius: 4px;
         border: 1px solid rgba(0,0,0,0.1);
         position: relative;
         aspect-ratio: 1.2 / 1;
     }
 
-    .label-p { position: absolute; top: 2px; left: 4px; font-size: 9px; opacity: 0.8; }
+    .label-p { position: absolute; top: 1px; left: 3px; font-size: 8px; opacity: 0.7; }
 
-    .net-divider {
-        width: 100%; height: 20px;
-        background-color: #222;
-        margin: 8px 0;
-        border: 2px solid #000;
+    /* --- ΤΟ ΚΛΕΙΔΙ ΓΙΑ ΤΑ ΚΟΥΜΠΙΑ --- */
+    /* Επιβολή οριζόντιας διάταξης σε ΟΛΑ τα επίπεδα containers του Streamlit */
+    div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        gap: 4px !important;
     }
 
-    .opp-court { background-color: #5DADE2 !important; color: #1B2631 !important; }
-    .oly-court { background-color: #C0392B !important; color: #FFFFFF !important; }
+    div[data-testid="column"] {
+        flex: 1 1 0% !important;
+        min-width: 0 !important; /* Απαραίτητο για να μην σπάει η σειρά */
+        max-width: 33% !important;
+    }
 
-    .highlight-target { background-color: #F1C40F !important; color: #000 !important; border: 2px solid #333; }
-    .highlight-setter { background-color: #E67E22 !important; color: #fff !important; border: 2px solid #D35400; }
-
-    /* --- ΤΟ ΚΛΕΙΔΙ: CUSTOM HTML BUTTON ROW --- */
-    .custom-btn-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 5px;
-        width: 100%;
-        margin-top: 15px;
+    /* Στυλ Κουμπιών */
+    div.stButton > button {
+        background-color: #1E88E5 !important;
+        color: white !important;
+        border-radius: 6px !important;
+        height: 3.5rem !important;
+        font-weight: bold !important;
+        font-size: 10px !important; /* Μικρότερο font για να χωράει παντού */
+        width: 100% !important;
+        border: none !important;
+        padding: 2px !important;
+        line-height: 1.1 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -96,21 +107,18 @@ if 'active' not in st.session_state: st.session_state.active = False
 
 # --- UI ---
 if not st.session_state.active:
-    st.markdown("<h2 style='text-align: center;'>🏐 Tactical Setup</h2>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>🏐 Setup</h3>", unsafe_allow_html=True)
     with st.form("setup"):
-        c1, c2 = st.columns(2)
-        side = c1.radio("Σερβίς:", ["Ολυμπιακός", "Αντίπαλος"], horizontal=True)
-        opp_s_pos = c2.slider("Πασαδόρος Αντιπάλου", 1, 6, 1)
+        side = st.radio("Σερβίς:", ["Ολυμπιακός", "Αντίπαλος"], horizontal=True)
+        opp_s_pos = st.slider("Πασαδόρος Αντιπάλου", 1, 6, 1)
         st.divider()
         l, r = st.columns(2)
         with l:
-            st.subheader("🔴 OLY")
             op = st.number_input("Π", value=19); ok1 = st.number_input("Κ1", value=22)
             oa1 = st.number_input("Α1", value=8); oa2 = st.number_input("Α2", value=7)
             ok2 = st.number_input("Κ2", value=21); od = st.number_input("Δ", value=14)
             mt = st.selectbox("Στόχος OLY", [op, oa1, ok2, od, oa2, ok1], index=1)
         with r:
-            st.subheader("🚀 ANT")
             ap = st.number_input("Π Αντ.", value=31); aa1 = st.number_input("Α1 Αντ.", value=77)
             ak2 = st.number_input("Κ2 Αντ.", value=12); ad = st.number_input("Δ Αντ.", value=8)
             aa2 = st.number_input("Α2 Αντ.", value=7); ak1 = st.number_input("Κ1 Αντ.", value=6)
@@ -150,45 +158,23 @@ else:
         oly_html += f'<div class="{cls}"><span class="label-p">P{p}</span>{val}</div>'
     st.markdown(oly_html + '</div>', unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # --- ΤΟ ΚΟΛΠΟ: Χρήση κουμπιών χωρίς Columns του Streamlit ---
-    # Δημιουργούμε μια "ψεύτικη" σειρά κουμπιών που το Streamlit δεν μπορεί να σπάσει
-    st.write("") # space
+    # --- ΤΑ ΚΟΥΜΠΙΑ ΠΟΥ ΔΕΝ ΣΠΑΝΕ ΠΟΤΕ ---
+    st.write("") # Spacer
+    c1, c2, c3 = st.columns(3)
     
-    # Χρησιμοποιούμε st.button αλλά με CSS που τα κάνει "inline-block" και τα "αναγκάζει" να μείνουν μαζί
-    cols = st.columns([1,1,1])
-    with cols[0]:
-        if st.button("Περιστρ. (-)", key="btn_prev", use_container_width=True):
+    with c1:
+        if st.button("Περιστρ. (-)", key="p1"):
             st.session_state.oly_p = get_next_pos(st.session_state.oly_p, -1)
             st.session_state.opp_p = get_next_pos(st.session_state.opp_p, -1)
             st.rerun()
-    with cols[1]:
-        if st.button("Νέα Εργασία", key="btn_new", use_container_width=True):
+    with c2:
+        if st.button("Νέα Εργασία", key="p2"):
             st.session_state.active = False
             st.rerun()
-    with cols[2]:
-        if st.button("Περιστρ. (+)", key="btn_next", use_container_width=True):
+    with c3:
+        if st.button("Περιστρ. (+)", key="p3"):
             st.session_state.oly_p = get_next_pos(st.session_state.oly_p, 1)
             st.session_state.opp_p = get_next_pos(st.session_state.opp_p, 1)
             st.rerun()
 
-    # ΕΠΙΠΛΕΟΝ CSS ΓΙΑ ΝΑ ΜΗΝ ΣΠΑΝΕ ΠΟΤΕ ΤΑ COLUMNS
-    st.markdown("""
-    <script>
-        var cols = window.parent.document.querySelectorAll('[data-testid="column"]');
-        cols.forEach(function(col) {
-            col.style.minWidth = '0px';
-            col.style.flex = '1';
-        });
-    </script>
-    <style>
-        [data-testid="stHorizontalBlock"] {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
